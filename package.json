@@ -1,0 +1,26 @@
+{
+  "name": "basic-auth-api-gateway",
+  "version": "1.0.0",
+  "description": "Basic auth for API Gateway",
+  "main": "authenticate.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elerch/basic-auth-api-gateway.git"
+  },
+  "author": "Emil Lerch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elerch/basic-auth-api-gateway/issues"
+  },
+  "homepage": "https://github.com/elerch/basic-auth-api-gateway#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  }
+}
