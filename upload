@@ -9,6 +9,7 @@ if [ "x$1" = "x" ]; then
 fi
 
 fn_name=${3:-basic-auth-api-gateway}
+acct=$(awsaccountnumber)
 
 zip authenticate.zip authenticate.js && \
 aws lambda create-function \
@@ -17,7 +18,7 @@ aws lambda create-function \
   --handler authenticate.authenticate \
   --zip-file fileb://authenticate.zip \
   --environment "Variables={AUTH_USER=$1,AUTH_PASS=$2}" \
-  --role arn:aws:iam::931443760666:role/lambda_basic_execution
+  --role arn:aws:iam::$acct:role/lambda_basic_execution
 if [ $? -ne 0 ]; then
   echo error creating function. If it already exists, use
   echo aws lambda delete-function --function-name $fn_name
