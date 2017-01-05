@@ -1,6 +1,7 @@
+'use strict';
 var authenticate = require('../authenticate.js').authenticate;
 var expect = require('chai').expect;
-
+var currentState = {};
 function getContext() {
   return {
     currentState : {},
@@ -24,7 +25,7 @@ describe('auth(req)', function () {
     var context = getContext();
     authenticate(
       {authorizationToken: "basic Zm9vOmJhcg=="}, // foo, bar
-      context, {user: 'foo', pass: 'bar'});
+      context, undefined, {user: 'foo', pass: 'bar'});
     expect(currentState.result).to.equal('success');
     // no other assertions at this time - policy later
     //console.log(currentState.policy);
@@ -34,7 +35,7 @@ describe('auth(req)', function () {
     var context = getContext();
     authenticate(
       {authorizationToken: "basic Zm9vOmJhcg=="}, // foo, bar
-      context, {user: 'foo', pass: 'qux'});
+      context, undefined, {user: 'foo', pass: 'qux'});
     expect(currentState.result).to.equal('fail');
     // no other assertions at this time - policy later
     //console.log(currentState.policy);
@@ -49,10 +50,24 @@ describe('auth(req)', function () {
     authenticate(
       {authorizationToken: "basic Zm9vOmJhcg==", // foo, bar
        methodArn: "arn:ec2::*"}, // will be resource in policy
-      context, {user: 'foo', pass: 'bar'});
+      context, undefined,{user: 'foo', pass: 'bar'});
 
     expect(currentState.policy.principalId).to.equal('foo');
     expect(currentState.policy.policyDocument.Statement.toString())
       .to.equal(expectedStatement.toString());
+  });
+
+  it ('should work with environment variables', () => {
+    let context = getContext();
+    process.env.AUTH_USER = 'foo';
+    process.env.AUTH_PASS = 'bar';
+    authenticate(
+      {authorizationToken: 'basic Zm9vOmJhcg=='}, context);
+    expect(currentState.result).to.equal('success');
+
+    process.env.AUTH_PASS = 'nobueno';
+    authenticate(
+      {authorizationToken: 'basic Zm9vOmJhcg=='}, context);
+    expect(currentState.result).to.equal('fail');
   });
 });

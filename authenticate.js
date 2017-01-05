@@ -58,15 +58,29 @@ function Credentials(name, pass) {
   this.pass = pass;
 }
 
-exports.authenticate = function(event, context, config) {
+exports.authenticate = function(event, context, callback, config) {
   var token = event.authorizationToken;
   // Call oauth provider, crack jwt token, etc.
   // In this example, the token is treated as the status for simplicity.
   var user = userFromBasicAuthString(token);
+  // If we haven't been provided anything, hit the environment vars
+  if (!config) {
+    config = () => { return {
+      user: process.env.AUTH_USER,
+      pass: process.env.AUTH_PASS
+    }};
+  }
   var configFn = typeof config === 'function' ?
                   config :
                   function() { return config; };
-  var finalConfig = configFn() || serverConfig;
+
+
+  var finalConfig = configFn(); 
+  if (!finalConfig || !finalConfig.user || !finalConfig.pass) {
+    console.log('configuration missing user, pass or both');
+    context.fail('error');
+    return;
+  }
 
   if (!user || !user.name || !user.pass) {
     context.fail("error");
