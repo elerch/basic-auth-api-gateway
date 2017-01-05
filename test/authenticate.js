@@ -70,4 +70,12 @@ describe('auth(req)', function () {
       {authorizationToken: 'basic Zm9vOmJhcg=='}, context);
     expect(currentState.result).to.equal('fail');
   });
+
+  it ('should work without "basic" preamble', () => {
+    let context = getContext();
+    process.env.AUTH_USER = 'foo';
+    process.env.AUTH_PASS = 'bar';
+    authenticate({authorizationToken: 'Zm9vOmJhcg=='}, context);
+    expect(currentState.result).to.equal('success');
+  });
 });

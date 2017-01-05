@@ -25,7 +25,12 @@ function userFromBasicAuthString(header) {
   var match = credentialsRegExp.exec(header || '');
 
   if (!match) {
-    return null;
+    if (!header) {
+      console.log('no header provided');
+      return null;
+    }
+    // assume the token does not include 'basic '
+    match = ['', header];
   }
 
   // decode user pass
