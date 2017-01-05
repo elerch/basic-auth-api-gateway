@@ -1,0 +1,25 @@
+#!/bin/bash
+awsaccountnumber () {
+        aws ec2 describe-security-groups --group-names 'Default' --query 'SecurityGroups[0].OwnerId' --output text $*
+}
+
+if [ "x$1" = "x" ]; then
+  echo usage: $0 username password [function-name]
+  exit 1
+fi
+
+fn_name=${3:-basic-auth-api-gateway}
+
+zip authenticate.zip authenticate.js && \
+aws lambda create-function \
+  --function-name $fn_name \
+  --runtime nodejs4.3 \
+  --handler authenticate.authenticate \
+  --zip-file fileb://authenticate.zip \
+  --environment "Variables={AUTH_USER=$1,AUTH_PASS=$2}" \
+  --role arn:aws:iam::931443760666:role/lambda_basic_execution
+if [ $? -ne 0 ]; then
+  echo error creating function. If it already exists, use
+  echo aws lambda delete-function --function-name $fn_name
+fi
+rm authenticate.zip
